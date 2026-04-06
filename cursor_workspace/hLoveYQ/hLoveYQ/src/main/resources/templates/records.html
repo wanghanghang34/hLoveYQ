@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('护你周全 · 记录')}"></head>
+<body th:replace="~{fragments/layout :: shell('records', ~{::main})}">
+<main>
+  <section class="mb-6 flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">记录</h1>
+      <p class="mt-1 text-slate-600">慢慢来，一条条写下就好。</p>
+    </div>
+    <a th:href="@{/records/new}"
+       class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-pink-600 text-white text-sm hover:bg-pink-500">
+      新增记录
+    </a>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-100 text-sm text-slate-600">
+      最近 12 条
+    </div>
+
+    <div th:if="${#lists.isEmpty(records)}" class="p-6 text-slate-600">
+      还没有记录。先从一次开始日期开始吧。
+    </div>
+
+    <div th:if="${!#lists.isEmpty(records)}" class="divide-y divide-slate-100">
+      <div th:each="r : ${records}" class="p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="font-medium">
+            <span th:text="${#temporals.format(r.startDate,'yyyy-MM-dd')}">—</span>
+            <span class="text-slate-500" th:if="${r.endDate != null}">
+              ~ <span th:text="${#temporals.format(r.endDate,'yyyy-MM-dd')}">—</span>
+            </span>
+            <span class="text-slate-500" th:if="${r.endDate == null}">（进行中）</span>
+          </div>
+          <div class="text-sm text-slate-600 flex items-center gap-3">
+            <span th:if="${r.flowLevel != null}">流量 <span class="font-medium" th:text="${r.flowLevel}">-</span>/5</span>
+            <span th:if="${r.painLevel != null}">疼痛 <span class="font-medium" th:text="${r.painLevel}">-</span>/10</span>
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-slate-600" th:if="${r.note != null && !#strings.isEmpty(r.note)}" th:text="${r.note}">
+          备注
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
+

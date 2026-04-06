@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('护你周全 · 新增记录')}"></head>
+<body th:replace="~{fragments/layout :: shell('records', ~{::main})}">
+<main>
+  <section class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">新增记录</h1>
+    <p class="mt-1 text-slate-600">轻轻写下这一次的开始与感受。</p>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6">
+    <div th:if="${recordError}" class="mb-4 rounded-2xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-800"
+         th:text="${recordError}">
+      保存失败
+    </div>
+
+    <form th:action="@{/records}" th:object="${form}" method="post" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-slate-600">开始日期 *</label>
+          <input th:field="*{startDate}" type="date" required
+                 class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300" />
+          <p class="mt-1 text-xs text-rose-700" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}">错误</p>
+        </div>
+
+        <div>
+          <label class="text-sm text-slate-600">结束日期</label>
+          <input th:field="*{endDate}" type="date"
+                 class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300" />
+          <p class="mt-1 text-xs text-slate-500">不填表示“进行中”。</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-slate-600">流量强度（1-5）</label>
+          <input th:field="*{flowLevel}" type="number" min="1" max="5" inputmode="numeric"
+                 class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300" />
+          <p class="mt-1 text-xs text-rose-700" th:if="${#fields.hasErrors('flowLevel')}" th:errors="*{flowLevel}">错误</p>
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">疼痛程度（0-10）</label>
+          <input th:field="*{painLevel}" type="number" min="0" max="10" inputmode="numeric"
+                 class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300" />
+          <p class="mt-1 text-xs text-rose-700" th:if="${#fields.hasErrors('painLevel')}" th:errors="*{painLevel}">错误</p>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm text-slate-600">备注</label>
+        <textarea th:field="*{note}" rows="4"
+                  class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300"
+                  placeholder="比如：今天有点累，记得早点休息。"></textarea>
+        <p class="mt-1 text-xs text-rose-700" th:if="${#fields.hasErrors('note')}" th:errors="*{note}">错误</p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="rounded-2xl bg-pink-600 text-white px-5 py-3 font-medium hover:bg-pink-500">
+          保存
+        </button>
+        <a th:href="@{/records}" class="rounded-2xl border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50">
+          返回列表
+        </a>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>
+

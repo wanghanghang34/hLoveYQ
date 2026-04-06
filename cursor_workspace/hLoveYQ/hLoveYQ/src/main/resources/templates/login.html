@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>护你周全 · 登录</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" />
+  <link rel="manifest" th:href="@{/manifest.webmanifest}" />
+  <meta name="theme-color" content="#F472B6" />
+</head>
+
+<body class="min-h-screen bg-gradient-to-b from-[#FFF7ED] via-white to-white text-slate-900">
+  <main class="mx-auto max-w-md px-4 py-10">
+    <div class="text-center">
+      <div class="mx-auto h-12 w-12 rounded-3xl bg-pink-400/20 grid place-items-center">
+        <span class="text-pink-600 font-semibold text-lg">周</span>
+      </div>
+      <h1 class="mt-4 text-2xl font-semibold tracking-tight">护你周全</h1>
+      <p class="mt-1 text-slate-600">欢迎回来。今天也要对自己温柔一点。</p>
+    </div>
+
+    <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div th:if="${registered}" class="mb-4 rounded-2xl bg-emerald-50 border border-emerald-200 p-3 text-sm text-emerald-800">
+        注册成功啦！现在可以登录了。
+      </div>
+      <div th:if="${error}" class="mb-4 rounded-2xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-800">
+        邮箱或密码不正确，请再试一次。
+      </div>
+      <div th:if="${logout}" class="mb-4 rounded-2xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700">
+        你已退出登录。
+      </div>
+
+      <form th:action="@{/login}" method="post" class="space-y-4">
+        <div>
+          <label class="text-sm text-slate-600">邮箱</label>
+          <input name="username" type="email" autocomplete="email" required
+                 class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300" />
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">密码</label>
+          <input name="password" type="password" autocomplete="current-password" required
+                 class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-4 focus:ring-pink-200 focus:border-pink-300" />
+        </div>
+        <button type="submit"
+                class="w-full rounded-2xl bg-pink-600 text-white py-3 font-medium hover:bg-pink-500">
+          登录
+        </button>
+      </form>
+
+      <div class="mt-5 text-center text-sm text-slate-600">
+        还没有账号？
+        <a th:href="@{/register}" class="text-pink-700 hover:text-pink-600 font-medium">去注册</a>
+      </div>
+    </div>
+
+    <div class="mt-6 text-xs text-slate-500 leading-relaxed">
+      <div class="rounded-2xl border border-slate-200 bg-white/60 p-4">
+        本应用仅用于记录与参考，不替代医疗建议。如有明显不适或担忧，请及时咨询专业医生。
+      </div>
+    </div>
+  </main>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
+    }
+  </script>
+</body>
+</html>
+

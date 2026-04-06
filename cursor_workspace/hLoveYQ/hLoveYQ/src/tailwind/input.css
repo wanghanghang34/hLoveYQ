@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Small tweaks for a warm, soft feel */
+html { color-scheme: light; }
+

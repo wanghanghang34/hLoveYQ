@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('护你周全 · 日历')}"></head>
+<body th:replace="~{fragments/layout :: shell('calendar', ~{::main})}">
+<main>
+  <section class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">日历</h1>
+    <p class="mt-1 text-slate-600">用暖色标记经期与预测区间，让你更从容。</p>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6">
+    <div class="flex items-center justify-between gap-3">
+      <div class="font-medium" th:text="${vm.title}">2026 年 4 月</div>
+      <div class="flex items-center gap-2">
+        <a th:href="@{/calendar(year=${vm.prevYear}, month=${vm.prevMonth})}"
+           class="px-3 py-2 rounded-2xl border border-slate-200 hover:bg-slate-50 text-sm">
+          上个月
+        </a>
+        <a th:href="@{/calendar}"
+           class="px-3 py-2 rounded-2xl bg-pink-600 text-white hover:bg-pink-500 text-sm">
+          本月
+        </a>
+        <a th:href="@{/calendar(year=${vm.nextYear}, month=${vm.nextMonth})}"
+           class="px-3 py-2 rounded-2xl border border-slate-200 hover:bg-slate-50 text-sm">
+          下个月
+        </a>
+      </div>
+    </div>
+
+    <!-- 图例 -->
+    <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+      <div class="inline-flex items-center gap-2">
+        <span class="h-3 w-3 rounded-full bg-pink-600"></span> 经期
+      </div>
+      <div class="inline-flex items-center gap-2">
+        <span class="h-3 w-3 rounded-full bg-pink-200 border border-pink-200"></span> 预测经期（参考）
+      </div>
+      <div class="inline-flex items-center gap-2">
+        <span class="h-3 w-3 rounded-full bg-white border border-dashed border-pink-400"></span> 预测开始窗口（±3 天）
+      </div>
+    </div>
+
+    <!-- 星期栏 -->
+    <div class="mt-5 grid grid-cols-7 gap-2 text-xs text-slate-500">
+      <div class="text-center">一</div>
+      <div class="text-center">二</div>
+      <div class="text-center">三</div>
+      <div class="text-center">四</div>
+      <div class="text-center">五</div>
+      <div class="text-center">六</div>
+      <div class="text-center">日</div>
+    </div>
+
+    <!-- 月历格子 -->
+    <div class="mt-2 grid grid-cols-7 gap-2">
+      <th:block th:each="week : ${vm.weeks}">
+        <th:block th:each="d : ${week}">
+          <div class="rounded-2xl border border-slate-100 p-2 h-20 relative overflow-hidden"
+               th:classappend="${!d.inMonth} ? ' bg-slate-50/60 text-slate-400' : ' bg-white'">
+
+            <!-- 预测窗口：虚线描边 -->
+            <div th:if="${d.predictedWindow}"
+                 class="absolute inset-0 rounded-2xl border border-dashed border-pink-400 pointer-events-none"></div>
+
+            <!-- 预测经期：浅色底 -->
+            <div th:if="${d.predicted}"
+                 class="absolute inset-0 bg-pink-200/40 pointer-events-none"></div>
+
+            <!-- 实际经期：更深的底 -->
+            <div th:if="${d.period}"
+                 class="absolute inset-0 bg-pink-600/20 pointer-events-none"></div>
+
+            <!-- 日期数字 -->
+            <div class="relative z-10 flex items-center justify-between">
+              <div class="text-sm font-medium"
+                   th:text="${#temporals.day(d.date)}">1</div>
+              <div th:if="${d.today}"
+                   class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-white">
+                今天
+              </div>
+            </div>
+
+          </div>
+        </th:block>
+      </th:block>
+    </div>
+
+    <div class="mt-4 text-xs text-slate-500 leading-relaxed">
+      预测仅供参考，身体的节奏会随生活变化而调整。
+    </div>
+  </section>
+</main>
+</body>
+</html>
+

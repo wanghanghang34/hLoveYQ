@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('护你周全 · 洞察')}"></head>
+<body th:replace="~{fragments/layout :: shell('insights', ~{::main})}">
+<main>
+  <section class="mb-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">洞察</h1>
+        <p class="mt-1 text-slate-600">
+          <span th:text="${vm.nickname}">你</span>，给你一份温柔的总结。
+          <span class="text-slate-400" th:text="'更新于 ' + ${#temporals.format(vm.asOfDate, 'yyyy-MM-dd')}">更新于</span>
+        </p>
+      </div>
+      <a th:href="@{/export.csv}"
+         class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:bg-slate-800">
+        导出 CSV
+      </a>
+    </div>
+  </section>
+
+  <section th:if="${vm.lastPeriodStart == null}" class="mb-6">
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="font-medium">先记下第一次记录吧</div>
+      <p class="mt-1 text-sm text-slate-600">
+        有了开始日期，洞察和预测就会慢慢变得更贴近你。
+      </p>
+      <a th:href="@{/records/new}"
+         class="mt-4 inline-flex px-4 py-2 rounded-2xl bg-pink-600 text-white text-sm hover:bg-pink-500">
+        新增记录
+      </a>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="text-sm text-slate-500">平均周期</div>
+      <div class="mt-2 flex items-end gap-2">
+        <div class="text-3xl font-semibold" th:text="${vm.avgCycleDays != null ? vm.avgCycleDays : '—'}">—</div>
+        <div class="text-slate-500 mb-1">天</div>
+      </div>
+      <p class="mt-2 text-sm text-slate-600">这只是统计参考，不必被数字绑住。</p>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="text-sm text-slate-500">平均经期长度</div>
+      <div class="mt-2 flex items-end gap-2">
+        <div class="text-3xl font-semibold" th:text="${vm.avgPeriodLenDays != null ? vm.avgPeriodLenDays : '—'}">—</div>
+        <div class="text-slate-500 mb-1">天</div>
+      </div>
+      <p class="mt-2 text-sm text-slate-600">慢慢记录，规律会更清晰。</p>
+    </div>
+
+    <div class="rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50 to-white p-5">
+      <div class="text-sm text-slate-500">下次可能来访</div>
+      <div class="mt-2 text-xl font-semibold">
+        <span th:text="${vm.nextStartDate != null ? #temporals.format(vm.nextStartDate, 'MM-dd') : '—'}">—</span>
+        <span class="text-sm font-normal text-slate-500">（±3 天）</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-600">
+        <span th:if="${vm.nextStartFrom != null && vm.nextStartTo != null}"
+              th:text="'大约在 ' + ${#temporals.format(vm.nextStartFrom,'MM-dd')} + ' ~ ' + ${#temporals.format(vm.nextStartTo,'MM-dd')} + ' 之间'">
+          大约在 — ~ — 之间
+        </span>
+      </p>
+      <p class="mt-2 text-xs text-slate-500">
+        预测依据：
+        <span th:text="${vm.predictionBasis}">weighted_last_3</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="flex items-center justify-between">
+        <div class="font-medium">节奏稳定度</div>
+        <div class="text-xs text-slate-500">最近 12 次</div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-3 gap-3">
+        <div class="rounded-2xl bg-slate-50 p-3">
+          <div class="text-xs text-slate-500">最短</div>
+          <div class="mt-1 font-semibold">
+            <span th:text="${vm.cycleMinDays != null ? vm.cycleMinDays : '—'}">—</span><span class="text-slate-500"> 天</span>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 p-3">
+          <div class="text-xs text-slate-500">最长</div>
+          <div class="mt-1 font-semibold">
+            <span th:text="${vm.cycleMaxDays != null ? vm.cycleMaxDays : '—'}">—</span><span class="text-slate-500"> 天</span>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 p-3">
+          <div class="text-xs text-slate-500">波动</div>
+          <div class="mt-1 font-semibold">
+            <span th:text="${vm.cycleStdDays != null ? #numbers.formatDecimal(vm.cycleStdDays, 1, 1) : '—'}">—</span>
+            <span class="text-slate-500"> 天</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-3 text-sm text-slate-600">
+        最近起伏稍大也很常见，压力、作息、旅行都可能影响。
+      </p>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="flex items-center justify-between">
+        <div class="font-medium">最近 3 次周期</div>
+        <a th:href="@{/calendar}" class="text-sm text-pink-700 hover:text-pink-600">去日历看看</a>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span th:each="d : ${vm.last3CycleDays}"
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-pink-50 text-pink-800 text-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-pink-500"></span>
+          <span th:text="${d}">28</span><span class="text-pink-700/70">天</span>
+        </span>
+
+        <span th:if="${#lists.isEmpty(vm.last3CycleDays)}"
+              class="text-sm text-slate-500">
+          记录再多一点点，这里会更清晰。
+        </span>
+      </div>
+
+      <p class="mt-3 text-sm text-slate-600">
+        每一次记录都在帮你更懂自己的节奏。
+      </p>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="flex items-center justify-between">
+        <div class="font-medium">流量强度分布</div>
+        <div class="text-xs text-slate-500">1（少）→ 5（多）</div>
+      </div>
+
+      <div class="mt-4 space-y-2">
+        <div th:each="lc : ${vm.flowHistogram}" class="flex items-center gap-3">
+          <div class="w-10 text-sm text-slate-500" th:text="${lc.level}">1</div>
+          <div class="flex-1 h-2.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-pink-400 to-fuchsia-400"
+                 th:style="'width:' + ${lc.percent} + '%'"></div>
+          </div>
+          <div class="w-10 text-right text-sm text-slate-600" th:text="${lc.count}">0</div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(vm.flowHistogram)}" class="text-sm text-slate-500">
+          记录一次流量强度，这里就会开始有图啦。
+        </div>
+      </div>
+
+      <p class="mt-3 text-sm text-slate-600">
+        每次都不一样也没关系，你已经在认真照顾自己了。
+      </p>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="font-medium">疼痛概览</div>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="rounded-2xl bg-slate-50 p-3">
+          <div class="text-xs text-slate-500">平均</div>
+          <div class="mt-1 font-semibold">
+            <span th:text="${vm.avgPainLevel != null ? #numbers.formatDecimal(vm.avgPainLevel, 1, 1) : '—'}">—</span>
+            <span class="text-slate-500">/ 10</span>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 p-3">
+          <div class="text-xs text-slate-500">最近一次</div>
+          <div class="mt-1 font-semibold">
+            <span th:text="${vm.lastPainLevel != null ? vm.lastPainLevel : '—'}">—</span>
+            <span class="text-slate-500">/ 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 rounded-2xl bg-pink-50 border border-pink-100 p-3 text-sm text-pink-900">
+        <span class="font-medium">小提醒：</span>
+        若疼痛持续严重影响生活，咨询专业医生是很勇敢的选择。
+      </div>
+    </div>
+  </section>
+
+  <section th:if="${vm.alerts != null && !#lists.isEmpty(vm.alerts)}" class="mb-8">
+    <div class="rounded-3xl border border-slate-200 bg-white p-5">
+      <div class="font-medium">温柔提醒</div>
+      <div class="mt-4 space-y-3">
+        <div th:each="a : ${vm.alerts}"
+             class="rounded-2xl p-4 border"
+             th:classappend="${
+               a.severity == 'recommend' ? ' border-rose-200 bg-rose-50' :
+               (a.severity == 'gentle' ? ' border-amber-200 bg-amber-50' : ' border-slate-200 bg-slate-50')
+             }">
+          <div class="font-medium" th:text="${a.title}">标题</div>
+          <p class="mt-1 text-sm text-slate-700" th:text="${a.message}">内容</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="pb-10">
+    <div class="text-xs text-slate-500 leading-relaxed">
+      <div class="rounded-2xl border border-slate-200 bg-white/60 p-4">
+        本应用仅用于记录与参考，不替代医疗建议。如有明显不适或担忧，请及时咨询专业医生。
+      </div>
+    </div>
+  </footer>
+</main>
+</body>
+</html>
+

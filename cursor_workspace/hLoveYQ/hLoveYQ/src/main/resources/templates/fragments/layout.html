@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title th:text="${title}">护你周全</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" />
+  <link rel="manifest" th:href="@{/manifest.webmanifest}" />
+  <meta name="theme-color" content="#F472B6" />
+</head>
+
+<body th:fragment="shell(active, content)" class="min-h-screen bg-gradient-to-b from-[#FFF7ED] via-white to-white text-slate-900">
+<header class="sticky top-0 z-20 backdrop-blur bg-white/70 border-b border-slate-200">
+  <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+    <a th:href="@{/}" class="inline-flex items-center gap-3">
+      <span class="h-9 w-9 rounded-2xl bg-pink-400/20 grid place-items-center">
+        <span class="text-pink-600 font-semibold">周</span>
+      </span>
+      <div class="leading-tight">
+        <div class="font-semibold">护你周全</div>
+        <div class="text-xs text-slate-500">温柔记录 · 安心洞察</div>
+      </div>
+    </a>
+
+    <nav class="hidden sm:flex items-center gap-2 text-sm">
+      <a th:href="@{/}" class="px-3 py-2 rounded-xl hover:bg-slate-100"
+         th:classappend="${active} == 'dashboard' ? ' bg-pink-50 text-pink-700' : ''">仪表盘</a>
+      <a th:href="@{/calendar}" class="px-3 py-2 rounded-xl hover:bg-slate-100"
+         th:classappend="${active} == 'calendar' ? ' bg-pink-50 text-pink-700' : ''">日历</a>
+      <a th:href="@{/records}" class="px-3 py-2 rounded-xl hover:bg-slate-100"
+         th:classappend="${active} == 'records' ? ' bg-pink-50 text-pink-700' : ''">记录</a>
+      <a th:href="@{/insights}" class="px-3 py-2 rounded-xl hover:bg-slate-100"
+         th:classappend="${active} == 'insights' ? ' bg-pink-50 text-pink-700' : ''">洞察</a>
+    </nav>
+
+    <form th:action="@{/logout}" method="post">
+      <button class="px-3 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-100">退出</button>
+    </form>
+  </div>
+</header>
+
+<main class="mx-auto max-w-6xl px-4 py-8" th:replace="${content}">
+  <div>content</div>
+</main>
+
+<script>
+  // Minimal PWA registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
+  }
+</script>
+</body>
+</html>
+
