@@ -1,0 +1,29 @@
+```
+# Java/Maven specific
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+```

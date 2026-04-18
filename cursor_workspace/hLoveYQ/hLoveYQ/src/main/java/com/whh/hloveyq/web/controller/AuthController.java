@@ -12,73 +12,84 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * 认证控制器
+ * 处理用户登录、注册相关请求
+ */
 @Controller
 public class AuthController {
-	private final UserService userService;
+    
+    private final UserService userService;
 
-	public AuthController(UserService userService) {
-		this.userService = userService;
-	}
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
-	@GetMapping("/login")
-	public String login(@RequestParam(value = "error", required = false) String error,
-	                    @RequestParam(value = "logout", required = false) String logout,
-	                    @RequestParam(value = "registered", required = false) String registered,
-	                    Model model) {
-		model.addAttribute("error", error != null);
-		model.addAttribute("logout", logout != null);
-		model.addAttribute("registered", registered != null);
-		return "login";
-	}
+    /**
+     * 显示登录页面
+     */
+    @GetMapping("/login")
+    public String login(@RequestParam(value = "error", required = false) String error,
+                        @RequestParam(value = "logout", required = false) String logout,
+                        @RequestParam(value = "registered", required = false) String registered,
+                        Model model) {
+        model.addAttribute("error", error != null);
+        model.addAttribute("logout", logout != null);
+        model.addAttribute("registered", registered != null);
+        return "login";
+    }
 
-	/**
-	 * Some clients (or reverse proxies) will call "/login/" with a trailing slash.
-	 * We treat it the same as "/login" to avoid an extra 302 hop.
-	 */
-	@GetMapping("/login/")
-	public String loginSlash(@RequestParam(value = "error", required = false) String error,
-	                         @RequestParam(value = "logout", required = false) String logout,
-	                         @RequestParam(value = "registered", required = false) String registered,
-	                         Model model) {
-		return login(error, logout, registered, model);
-	}
+    /**
+     * 处理带尾随斜杠的登录请求（兼容不同客户端）
+     */
+    @GetMapping("/login/")
+    public String loginSlash(@RequestParam(value = "error", required = false) String error,
+                             @RequestParam(value = "logout", required = false) String logout,
+                             @RequestParam(value = "registered", required = false) String registered,
+                             Model model) {
+        return login(error, logout, registered, model);
+    }
 
-	@GetMapping("/register")
-	public String register(Model model) {
-		if (!model.containsAttribute("form")) {
-			model.addAttribute("form", new RegisterForm());
-		}
-		return "register";
-	}
+    /**
+     * 显示注册页面
+     */
+    @GetMapping("/register")
+    public String register(Model model) {
+        if (!model.containsAttribute("form")) {
+            model.addAttribute("form", new RegisterForm());
+        }
+        return "register";
+    }
 
-	/**
-	 * Some clients (or reverse proxies) will call "/register/" with a trailing slash.
-	 * For a non-API web app, it's friendlier to treat it the same as "/register".
-	 */
-	@GetMapping("/register/")
-	public String registerSlash(Model model) {
-		return register(model);
-	}
+    /**
+     * 处理带尾随斜杠的注册请求（兼容不同客户端）
+     */
+    @GetMapping("/register/")
+    public String registerSlash(Model model) {
+        return register(model);
+    }
 
-	@PostMapping("/register")
-	public String doRegister(@Valid @ModelAttribute("form") RegisterForm form,
-	                         BindingResult bindingResult,
-	                         RedirectAttributes ra) {
-		if (bindingResult.hasErrors()) {
-			ra.addFlashAttribute("org.springframework.validation.BindingResult.form", bindingResult);
-			ra.addFlashAttribute("form", form);
-			return "redirect:/register";
-		}
+    /**
+     * 处理注册表单提交
+     */
+    @PostMapping("/register")
+    public String doRegister(@Valid @ModelAttribute("form") RegisterForm form,
+                             BindingResult bindingResult,
+                             RedirectAttributes ra) {
+        if (bindingResult.hasErrors()) {
+            ra.addFlashAttribute("org.springframework.validation.BindingResult.form", bindingResult);
+            ra.addFlashAttribute("form", form);
+            return "redirect:/register";
+        }
 
-		try {
-			userService.register(form.getEmail(), form.getPassword(), form.getNickname());
-		} catch (IllegalArgumentException ex) {
-			ra.addFlashAttribute("registerError", ex.getMessage());
-			ra.addFlashAttribute("form", form);
-			return "redirect:/register";
-		}
+        try {
+            userService.register(form.getEmail(), form.getPassword(), form.getNickname());
+        } catch (IllegalArgumentException ex) {
+            ra.addFlashAttribute("registerError", ex.getMessage());
+            ra.addFlashAttribute("form", form);
+            return "redirect:/register";
+        }
 
-		return "redirect:/login?registered";
-	}
+        return "redirect:/login?registered";
+    }
 }
-
